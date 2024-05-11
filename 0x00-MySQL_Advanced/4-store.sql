@@ -7,7 +7,7 @@ AFTER INSERT ON orders
 FOR EACH ROW
 BEGIN
     UPDATE items
-    SET quantity = quantity - NEW.quantity_ordered
+    SET quantity = quantity - NEW.number
     WHERE item_id = NEW.item_id;
 END;
 //
