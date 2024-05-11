@@ -4,7 +4,7 @@
 -- validation - distribute the logic to the database itself!
 DELIMETER $$
 CREATE TRIGGER reset_attribute_valide_email
-AFTER UPDATE ON users
+BEFORE UPDATE ON users
 FOR EACH ROW
 BEGIN 
     IF OLD.email <> NEW.email THEN
