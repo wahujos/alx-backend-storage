@@ -11,7 +11,7 @@ def schools_by_topic(mongo_collection, topic):
     mongo_collection will be the pymongo collection object
     topic (string) will be topic searched
     """
-    result = mongo_collection.find({"topic": topic})
+    result = mongo_collection.find({"topics": topic})
     return result
 
 if __name__ == "__main__":
@@ -20,3 +20,4 @@ if __name__ == "__main__":
     collection = db["mycollection"]
     result = schools_by_topic(collection, topic = "topic")
     client.close()
+    
