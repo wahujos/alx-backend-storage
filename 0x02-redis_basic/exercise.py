@@ -5,7 +5,25 @@ Writing strings to Redis
 
 import redis
 import uuid
+import functools
 from typing import Union, Callable, Optional
+
+
+def count_calls(method: Callable) -> Callable:
+    """
+    counts number of times the method are called num
+    """
+    key = method.__qualname__
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        increment call count and return original method
+        """
+        # key = f"{method.__qualname__}:calls"
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -20,6 +38,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Create a store method that takes a data argument and returns string
@@ -56,7 +75,7 @@ class Cache:
         """
         return self.get(key, fn=lambda d: d.decode('utf-8'))
 
-    def get_int(self, key: int) -> Union[int, None]:
+    def get_int(self, key: str) -> Union[int, None]:
         """
         Also, implement 2 new methods: get_str and get_int that will
         automatically parametrize Cache.get with the correct
