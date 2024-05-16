@@ -25,6 +25,32 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
     return wrapper
 
+def call_history(method: Callable) -> Callable:
+    """
+    call_history has a single parameter named method
+    that is a Callable and returns a Callable.
+    """
+    # input_key = method.__qualname__
+    # output_key = method.__qualname__
+    
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        Generate keys for input and output lists
+        """
+        # input_key = f"{method.__qualname__}:inputs"
+        # output_key = f"{method.__qualname__}:outputs"
+        # input = str(args)
+        # self._redis.rpush(input_key, input)
+        # output = method(self, *args, **kwargs)
+        # self._redis.rpush(output_key, output)
+        input = str(args)
+        self._redis.rpush(method.__qualname__ + ":inputs", input)
+        output = str(method(self, *args, **kwargs))
+        self._redis.rpush(method.__qualname__ + ":outputs", output)
+        return output
+    return wrapper
+
 
 class Cache:
     """
