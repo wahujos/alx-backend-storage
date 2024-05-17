@@ -113,7 +113,8 @@ class Cache:
 
 def replay(method: Callable):
     """
-    Function to display the history
+    we will implement a replay function to display the history of
+    calls of a particular function
     """
     redis_client = method.__self__._redis
     method_name = method.__qualname__
