@@ -25,6 +25,7 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
     return wrapper
 
+
 def call_history(method: Callable) -> Callable:
     """
     call_history has a single parameter named method
@@ -32,7 +33,7 @@ def call_history(method: Callable) -> Callable:
     """
     # input_key = method.__qualname__
     # output_key = method.__qualname__
-    
+
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         """
@@ -108,3 +109,23 @@ class Cache:
         conversion function.
         """
         return self.get(key, fn=int)
+
+
+def replay(method: Callable):
+    """
+    Function to display the history
+    """
+    redis_client = method.__self__._redis
+    method_name = method.__qualname__
+
+    input_key = f"{method_name}:inputs"
+    output_key = f"{method_name}:outputs"
+
+    inputs = redis_client.lrange(input_key, 0, -1)
+    outputs = redis_client.lrange(output_key, 0, -1)
+
+    print(f"{method_name} was called {len(inputs)} times:")
+
+    for input_, output in zip(inputs, outputs):
+        print(f"{method_name}(
+              *{input_.decode('utf-8')}) -> {output.decode('utf-8')}")
